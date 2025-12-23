@@ -2,6 +2,8 @@
 namespace Connector\Command;
 
 use Connector\Client\RssClient;
+use Connector\Endpoint\EndpointRegistry;
+use Connector\Service\PodcastEpisodeSaver;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -10,31 +12,45 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
     name: 'connector:fetch-api',
-    description: 'Fetch RSS/XML APIs and output items'
 )]
-class FetchApiCommand extends Command
+final class FetchApiCommand extends Command
 {
     public function __construct(
-        private RssClient $rssClient
+        private EndpointRegistry $registry,
+        private PodcastEpisodeSaver $saver
     ) {
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
-        $this->addArgument('api', InputArgument::OPTIONAL);
+        $this->addArgument('endpoint', InputArgument::OPTIONAL);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        foreach ($this->rssClient->fetch() as $item) {
+        $name = $input->getArgument('endpoint');
+
+        $endpoints = $name ? [$this->registry->get($name)] : $this->registry->all();
+
+        foreach ($endpoints as $endpoint) {
+            foreach ($endpoint->fetch() as $item) {
+                dump($item);
+            }
+        }
+
+        foreach ($endpoint->fetch() as $dto) {
+            $entity = $this->saver->save($dto);
+
             $output->writeln(sprintf(
-                '- %s (%s)',
-                $item->title,
-                $item->publishedAt->format('Y-m-d H:i')
+                '[%s] %s (%s)',
+                $entity->getPublishedAt()->format('Y-m-d H:i'),
+                $entity->getTitle(),
+                $entity->getStatus()
             ));
         }
 
         return Command::SUCCESS;
     }
 }
+
