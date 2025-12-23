@@ -16,7 +16,7 @@ class PodcastEpisodeEntity
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 64)]
+    #[ORM\Column(length: 255)]
     private ?string $guid = null;
 
     #[ORM\Column(length: 255)]
@@ -45,6 +45,9 @@ class PodcastEpisodeEntity
 
     #[ORM\Column(length: 20)]
     private ?string $status = null;
+
+    #[ORM\Column(length: 50)]
+    public string $source;
 
     public function getId(): ?int
     {
@@ -167,6 +170,18 @@ class PodcastEpisodeEntity
     public function setStatus(string $status): static
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getSource(): ?string
+    {
+        return $this->source;
+    }
+
+    public function setSource(?string $source): static
+    {
+        $this->source = $source;
 
         return $this;
     }

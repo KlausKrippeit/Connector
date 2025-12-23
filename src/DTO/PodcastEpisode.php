@@ -2,7 +2,7 @@
 
 namespace Connector\DTO;
 
-final readonly class PodcastEpisode
+final class PodcastEpisode
 {
     public function __construct(
         public string $guid,
@@ -13,5 +13,6 @@ final readonly class PodcastEpisode
         public string $audioUrl,
         public int $audioSize,
         public string $audioType,
+        public string $source,
     ) {}
 }

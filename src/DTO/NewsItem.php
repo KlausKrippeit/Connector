@@ -1,7 +1,7 @@
 <?php
 namespace Connector\DTO;
 
-final readonly class NewsItem
+final class NewsItem
 {
     public function __construct(
         public string $id,

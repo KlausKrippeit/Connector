@@ -1,0 +1,36 @@
+parameters:
+    connector_podcasts:
+        bit_rauschen:
+            url: 'https://bit-rauschen.podigee.io/feed/mp3'
+        ct_4004_podcast:
+            url: 'https://ct-3003.podigee.io/feed/mp3'
+        ct_auslegunssache:
+            url: 'https://ct-auslegungssache.podigee.io/feed/mp3'
+        heise_die_hupe:
+            url: 'https://die-hupe.podigee.io/feed/mp3'
+        ct_they_tallk_tech:
+            url: 'https://frauen-technik.podigee.io/feed/mp3'
+        heise_meets:
+            url: 'https://heise-meets.podigee.io/feed/mp3'
+        heise_ki_update:
+            url: 'https://kiupdate.podigee.io/feed/mp3'
+        heise_show:
+            url: 'https://www.heise.de/rss/heiseshowhd.rss'
+        ct_uplink:
+            url: 'https://ct-uplink.podigee.io/feed/mp3'
+        heise_passwort:
+            url: 'https://passwort.podigee.io/feed/mp3'
+        ct_verbraucherschutz:
+            url: 'https://vorsicht-kunde.podigee.io/feed/mp3'
+        heise_hoer_mal_wer_da_testet:
+            url: 'https://bestenlisten.podigee.io/feed/mp3'
+        heise_horizons:
+            url: 'https://horizons-podcast.podigee.io/feed/mp3'
+        heise_mac_and_i:
+            url: 'https://heise.de/mac-and-i/mac-and-i-audio-podcast.rss'
+        ct_foto_welt:
+            url: 'https://click-boom-flash.podigee.io/feed/mp3'
+        heise_the_next_big_think:
+            url: 'https://tnbt.podigee.io/feed/mp3'
+        heise_darknet_diaries_deutsch:
+            url: 'https://darknet-diaries-deutsch.podigee.io/feed/mp3'

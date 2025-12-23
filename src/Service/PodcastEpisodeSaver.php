@@ -28,7 +28,8 @@ final class PodcastEpisodeSaver
             $existing->setAudioUrl($dto->audioUrl);
             $existing->setAudioSize($dto->audioSize);
             $existing->setAudioType($dto->audioType);
-            $existing->setStatus('new'); // Reset falls nötig
+            //$existing->setStatus('new'); // Reset falls nötig
+            $existing->setSource($dto->source);
 
             $this->em->flush();
 
@@ -46,6 +47,7 @@ final class PodcastEpisodeSaver
         $entity->setAudioSize($dto->audioSize);
         $entity->setAudioType($dto->audioType);
         $entity->setStatus('new');
+        $entity->setSource($dto->source);
 
         $this->em->persist($entity);
         $this->em->flush();

@@ -1,7 +1,8 @@
 <?php
 namespace Connector\Command;
 
-use Connector\Client\RssClient;
+use Connector\Message\DownloadItemMessage;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Connector\Endpoint\EndpointRegistry;
 use Connector\Service\PodcastEpisodeSaver;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -17,7 +18,8 @@ final class FetchApiCommand extends Command
 {
     public function __construct(
         private EndpointRegistry $registry,
-        private PodcastEpisodeSaver $saver
+        private PodcastEpisodeSaver $saver,
+        private MessageBusInterface $bus
     ) {
         parent::__construct();
     }
@@ -34,22 +36,26 @@ final class FetchApiCommand extends Command
         $endpoints = $name ? [$this->registry->get($name)] : $this->registry->all();
 
         foreach ($endpoints as $endpoint) {
-            foreach ($endpoint->fetch() as $item) {
-                dump($item);
+            foreach ($endpoint->fetch() as $dto) {
+                $entity = $this->saver->save($dto);
+                $output->writeln(sprintf('Guid: %s', $entity->getGuid()));
+
+                $output->writeln(sprintf(
+                    'DB: [%s] %s (%s)',
+                    $entity->getPublishedAt()->format('Y-m-d H:i'),
+                    $entity->getTitle(),
+                    $entity->getStatus()
+                ));
+
+                $this->bus->dispatch(new DownloadItemMessage($entity->getGuid()));
+                $output->writeln(sprintf(
+                    'Dispatched: [%s] %s (meta saved, download queued)',
+                    $entity->getPublishedAt()->format('Y-m-d H:i'),
+                    $entity->getTitle(),
+                ));
             }
         }
-
-        foreach ($endpoint->fetch() as $dto) {
-            $entity = $this->saver->save($dto);
-
-            $output->writeln(sprintf(
-                '[%s] %s (%s)',
-                $entity->getPublishedAt()->format('Y-m-d H:i'),
-                $entity->getTitle(),
-                $entity->getStatus()
-            ));
-        }
-
+        
         return Command::SUCCESS;
     }
 }

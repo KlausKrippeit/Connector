@@ -36,13 +36,15 @@ class PodcastEpisodeEntityRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?PodcastEpisodeEntity
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function findOneByStatusField($status, $guid): ?PodcastEpisodeEntity
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.status = :status')
+            ->andWhere('p.guid = :guid')
+            ->setParameter('status', $status)
+            ->setParameter('guid', $guid)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 }
