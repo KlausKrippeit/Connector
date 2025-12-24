@@ -34,6 +34,7 @@ final class PodcastEndpoint implements EndpointInterface
                     audioUrl: (string) $item->enclosure['url'],
                     audioSize: (int) $item->enclosure['length'],
                     audioType: (string) $item->enclosure['type'],
+                    status: (string) '',
                     source: $source,
                 );
             }

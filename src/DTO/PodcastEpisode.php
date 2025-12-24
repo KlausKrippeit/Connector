@@ -13,6 +13,7 @@ final class PodcastEpisode
         public string $audioUrl,
         public int $audioSize,
         public string $audioType,
+        public string $status,
         public string $source,
     ) {}
 }

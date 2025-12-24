@@ -28,9 +28,10 @@ final class PodcastEpisodeSaver
             $existing->setAudioUrl($dto->audioUrl);
             $existing->setAudioSize($dto->audioSize);
             $existing->setAudioType($dto->audioType);
-            //$existing->setStatus('new'); // Reset falls nötig
+            $existing->setStatus($dto->status); // Reset falls nötig
             $existing->setSource($dto->source);
 
+            $this->em->persist($existing);
             $this->em->flush();
 
             return $existing;
