@@ -14,6 +14,8 @@ parameters:
             url: 'https://heise-meets.podigee.io/feed/mp3'
         heise_ki_update:
             url: 'https://kiupdate.podigee.io/feed/mp3'
+        heise_show_sd:
+            url: 'https://www.heise.de/rss/heiseshowsd.rss'
         heise_show:
             url: 'https://www.heise.de/rss/heiseshowhd.rss'
         ct_uplink:
@@ -34,3 +36,5 @@ parameters:
             url: 'https://tnbt.podigee.io/feed/mp3'
         heise_darknet_diaries_deutsch:
             url: 'https://darknet-diaries-deutsch.podigee.io/feed/mp3'
+        minkorrect:
+            url: "https://minkorrekt.de/feed/m4a/"

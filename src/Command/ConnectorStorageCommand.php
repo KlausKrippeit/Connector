@@ -34,7 +34,7 @@ class ConnectorStorageCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        
+
         $baseDir = '/home/deltadroid/storagebox/storage/podcast/';
 
         $files = [];
@@ -50,12 +50,12 @@ class ConnectorStorageCommand extends Command
         }
 
         file_put_contents('/home/deltadroid/podcast_list.csv', implode(', ', $files));
-        
+
         $io->success(sprintf(
             'Files: %s',
             implode(', ', $files)
         ));
-        
+
         return Command::SUCCESS;
     }
 }
