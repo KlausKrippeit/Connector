@@ -38,3 +38,17 @@ parameters:
             url: 'https://darknet-diaries-deutsch.podigee.io/feed/mp3'
         minkorrect:
             url: "https://minkorrekt.de/feed/m4a/"
+        bz_am_ohr:
+            url: "https://cdn.julephosting.de/podcasts/636-bz-am-ohr/feed.rss"
+        resonator:
+            url: "http://resonator-podcast.de/feed/m4a/"
+        daily_quarks:
+            url: "https://www1.wdr.de/mediathek/audio/daily-quarks/daily-quarks-podcast-104.podcast"
+        swr1_leute:
+            url: "https://www.swr.de/~podcast/swr1/podcast-swr1-leute-100.xml"
+        ct_zahlen_bitte:
+            url: "https://zahlenbitte.podigee.io/feed/mp3"
+#        bits_und_so_plus:
+#            url: "http://www.bitsundso.de/feed/plus/"
+        bits_und_so:
+            url: "http://www.bitsundso.de/feed/"

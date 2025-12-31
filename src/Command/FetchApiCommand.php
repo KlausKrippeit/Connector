@@ -104,7 +104,6 @@ final class FetchApiCommand extends Command
         $existing = array_map('trim', explode(',', $allredayDownloaded));
         $inArray = in_array($guid, $existing);
         $this->output->writeln(sprintf('Guid: %s in array: %s', $guid, $inArray ? 'yes' : 'no'));
-
         return $inArray;
     }
 
@@ -120,6 +119,8 @@ final class FetchApiCommand extends Command
             $entity->getPublishedAt()->format('Y-m-d H:i'),
             $entity->getTitle(),
         ));
+
+        return;
     }
 
     private function isSource(string $source, string $target): bool
@@ -140,7 +141,6 @@ final class FetchApiCommand extends Command
 
         $guid = preg_replace('/\/\?(?!.*\/\?)/', '-', $guid); // "/?" remmove
         $guid = preg_replace('/\=(?!.*\=)/', '-', $guid); // "=" remove
-
 
         preg_match('/[\/\.]?([a-z0-9][A-Za-z0-9-]{10,})(?:\.(?:mp3|mp4))?$/', $guid, $matches);
 

@@ -2,11 +2,12 @@
 
 namespace Connector\MessageHandler;
 
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
 use Connector\Message\DownloadItemMessage;
 use Connector\Repository\PodcastEpisodeEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -40,7 +41,7 @@ final class DownloadItemHandler
             }
 
             $freeSpace = disk_free_space($sourceDir);
-            $this->logger->info('FreeSpace: ' . $freeSpace);
+            $this->logger->info('FreeSpace: ' . $this->formatBytes($freeSpace));
             $this->logger->info('url: ' . $item->getAudioUrl());
             $guid = $item->getGuid();
 
@@ -74,9 +75,11 @@ final class DownloadItemHandler
             $finalFile = $sourceDir . '/' . $guid . '.' . $extension;
 
             if ($message->dryRun) {
+
                 $dummDownloadDir = '/home/deltadroid/storagebox/dummy';
                 $sourceDir = rtrim($dummDownloadDir, '/') . '/' . $item->source;
                 $finalFile = $sourceDir . '/' . $guid . '.' . $extension;
+
                 $this->createDummyFile($finalFile);
 
                 $item->setLocalPath($finalFile);
@@ -85,6 +88,7 @@ final class DownloadItemHandler
                 return;
             }
 
+            $this->logger->info('get origin');
             $tmpFile = tempnam(sys_get_temp_dir(), 'podcast_');
             $response = $this->client->request('GET', $item->getAudioUrl());
             if ($response->getStatusCode() != 200) {
@@ -104,11 +108,28 @@ final class DownloadItemHandler
 
             try {
                 file_put_contents($tmpFile, $response->getContent());
+                $this->logger->info('get origin - success');
             } catch (\Exception $e) {
                 $this->logger->error('not found: ' . $response->getInfo() . '## '  . $e->getMessage());
                 throw $e;
             }
-            rename($tmpFile, $finalFile);
+            $this->logger->info('rclone moveto');
+            //rename($tmpFile, $finalFile);
+            $process = new Process([
+                'rclone',
+                'moveto',
+                $tmpFile,
+                'deltadroid:storage/podcast/' . $item->source . '/' . $guid . '.' . $extension,
+                '--stats-one-line',
+            ]);
+
+            $process->setTimeout(300); // 5 Minuten
+            $process->run();
+            // Fehler?
+            if (!$process->isSuccessful()) {
+                throw new ProcessFailedException($process);
+            }
+            $this->logger->info('success');
 
             $item->setLocalPath($finalFile);
             $item->setStatus('downloaded');
@@ -137,5 +158,15 @@ final class DownloadItemHandler
         );
 
         file_put_contents($path, $content);
+    }
+
+    function formatBytes(float $bytes, int $precision = 2): string {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+        $bytes /= (1 << (10 * $pow));
+
+        return round($bytes, $precision) . ' ' . $units[$pow];
     }
 }
