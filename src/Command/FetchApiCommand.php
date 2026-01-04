@@ -3,11 +3,11 @@ namespace Connector\Command;
 
 use Connector\Entity\PodcastEpisodeEntity;
 use Connector\Message\DownloadItemMessage;
+use Connector\Service\SaverChooser;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Connector\Endpoint\EndpointRegistry;
-use Connector\Service\PodcastEpisodeSaver;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -27,7 +27,7 @@ final class FetchApiCommand extends Command
 
     public function __construct(
         private EndpointRegistry $registry,
-        private PodcastEpisodeSaver $saver,
+        private SaverChooser $saverChooser,
         private MessageBusInterface $bus,
         private LoggerInterface $logger,
     ) {
@@ -69,20 +69,24 @@ final class FetchApiCommand extends Command
         foreach ($endpoints as $endpoint) {
             foreach ($endpoint->fetch() as $dto) {
 
-                if (!$this->isSource($dto->source, 'heise_show_sd')) {
-                    //continue;
+                if (!$this->isSource($dto->source, 'aufdistanz')) {
+                    continue;
                 }
 
+                $this->output->writeln('Guid: ' . $dto->guid);
                 $guid = $this->getCleanGuid($dto->guid);
-/*
+                /*
                 $output->writeln(sprintf('Fetch o: %s', $dto->guid));
                 $output->writeln(sprintf('Fetch r: %s', $guid));
                 continue;
-*/
+                */
                 $inArray = $this->compare ? $this->comapre($guid) : false;
 
                 $inArray ? $dto->status = 'downloaded' : $dto->status = 'new';
-                $entity = $this->saver->save($dto);
+
+                $saver = $this->saverChooser->setSaver($endpoint->getName());
+                $entity = $saver->getSaverClass()->save($dto);
+
                 /*
                 $output->writeln(sprintf(
                     'DB: [%s] %s (%s)',
@@ -104,6 +108,7 @@ final class FetchApiCommand extends Command
         $existing = array_map('trim', explode(',', $allredayDownloaded));
         $inArray = in_array($guid, $existing);
         $this->output->writeln(sprintf('Guid: %s in array: %s', $guid, $inArray ? 'yes' : 'no'));
+
         return $inArray;
     }
 
@@ -135,6 +140,13 @@ final class FetchApiCommand extends Command
             $host = parse_url($guid, PHP_URL_HOST);
             $path = parse_url($guid, PHP_URL_PATH);
             $query = parse_url($guid, PHP_URL_QUERY);
+            if ($path !== '') {
+                preg_match('/[\/\.]?([a-z0-9][A-Za-z0-9-_]{10,})(?:\.(?:mp3|mp4))?$/', $path, $matches);
+                if (isset($matches[1])) {
+                    $path = $matches[1];
+                }
+            }
+
             $guid = $host .''. $path .''. $query;
 
         }
@@ -142,7 +154,7 @@ final class FetchApiCommand extends Command
         $guid = preg_replace('/\/\?(?!.*\/\?)/', '-', $guid); // "/?" remmove
         $guid = preg_replace('/\=(?!.*\=)/', '-', $guid); // "=" remove
 
-        preg_match('/[\/\.]?([a-z0-9][A-Za-z0-9-]{10,})(?:\.(?:mp3|mp4))?$/', $guid, $matches);
+        preg_match('/[\/\.]?([a-z0-9][A-Za-z0-9-_]{10,})(?:\.(?:mp3|mp4))?$/', $guid, $matches);
 
         if (isset($matches[1])) {
             $guid = $matches[1];

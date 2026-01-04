@@ -7,7 +7,7 @@ use Connector\Entity\PodcastEpisodeEntity as PodcastEpisodeEntity;
 use Connector\Repository\PodcastEpisodeEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
-final class PodcastEpisodeSaver
+class PodcastEpisodeSaver implements SaverInterface
 {
     public function __construct(
         private PodcastEpisodeEntityRepository $repository,

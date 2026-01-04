@@ -26,7 +26,6 @@ final class DownloadItemHandler
 
     public function __invoke(DownloadItemMessage $message): void
     {
-
         $item = $this->repository->findOneByStatusField('new',$message->guid);
 
         if (!$item) {
@@ -47,10 +46,15 @@ final class DownloadItemHandler
 
             // TODO: service classs !!!!!!
             if (str_starts_with($guid, 'http')) {
-
                 $host = parse_url($guid, PHP_URL_HOST);
                 $path = parse_url($guid, PHP_URL_PATH);
                 $query = parse_url($guid, PHP_URL_QUERY);
+                if ($path !== '') {
+                    preg_match('/[\/\.]?([a-z0-9][A-Za-z0-9-_]{10,})(?:\.(?:mp3|mp4))?$/', $path, $matches);
+                    if (isset($matches[1])) {
+                        $path = $matches[1];
+                    }
+                }
                 $guid = $host .''. $path .''. $query;
                 $guid = str_replace('/', '', $guid);
             }
@@ -59,7 +63,7 @@ final class DownloadItemHandler
             $guid = preg_replace('/\=(?!.*\=)/', '-', $guid);
 
             preg_match(
-                '/[\/\.]?([a-z0-9][A-Za-z0-9-]{10,})(?:\.(?:mp3|mp4))?$/',
+                '/[\/\.]?([a-z0-9][A-Za-z0-9-_]{10,})(?:\.(?:mp3|mp4))?$/',
                 $guid,
                 $matches
             );
@@ -107,7 +111,17 @@ final class DownloadItemHandler
             }
 
             try {
-                file_put_contents($tmpFile, $response->getContent());
+                $fp = fopen($tmpFile, 'w');
+
+                foreach ($this->client->stream($response) as $chunk) {
+                    if ($chunk->isTimeout()) {
+                        continue;
+                    }
+
+                    fwrite($fp, $chunk->getContent());
+                }
+
+                fclose($fp);
                 $this->logger->info('get origin - success');
             } catch (\Exception $e) {
                 $this->logger->error('not found: ' . $response->getInfo() . '## '  . $e->getMessage());
@@ -117,6 +131,8 @@ final class DownloadItemHandler
             //rename($tmpFile, $finalFile);
             $process = new Process([
                 'rclone',
+                '--config',
+                '/home/deltadroid/.config/rclone/rclone.conf',
                 'moveto',
                 $tmpFile,
                 'deltadroid:storage/podcast/' . $item->source . '/' . $guid . '.' . $extension,

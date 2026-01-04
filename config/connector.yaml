@@ -52,3 +52,14 @@ parameters:
 #            url: "http://www.bitsundso.de/feed/plus/"
         bits_und_so:
             url: "http://www.bitsundso.de/feed/"
+        media_39c3_hd:
+            url: "https://media.ccc.de/c/39c3/podcast/mp4-hq.xml"
+        sicherheitsluecke:
+            url: "https://www.sicherheitsluecke.fm/feed/mp3"
+        swr3_dark_matters:
+            url: "https://www.swr3.de/~podcast/podcasts/dark-matters-geheimnisse-der-geheimdienste-102.xml"
+        aufdistanz:
+            url: "http://aufdistanz.de/feed/mp3/"
+    connector_link:
+        media_39c3_hd:
+            url: "https://cdn.media.ccc.de/congress/2025/h264-hd/"

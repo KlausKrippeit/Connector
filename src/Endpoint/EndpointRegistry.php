@@ -29,6 +29,7 @@ final class EndpointRegistry
      */
     public function all(): iterable
     {
+        exit;
         return $this->endpoints;
     }
 }

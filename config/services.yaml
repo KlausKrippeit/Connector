@@ -8,7 +8,6 @@ imports:
 parameters:
     connector.download_dir: '/home/deltadroid/storagebox/storage/podcast'
 
-
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -43,3 +42,7 @@ services:
             $feeds: '%connector_podcasts%'
         tags: ['connector.endpoint']
 
+    Connector\Endpoint\LinkEndpoint:
+        arguments:
+            $feeds: '%connector_link%'
+        tags: ['connector.endpoint']
